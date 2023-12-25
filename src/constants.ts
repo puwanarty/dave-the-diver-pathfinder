@@ -226,7 +226,7 @@ export const INGREDIENTS = [
 		],
 	},
 	{
-		id: 'purle-sea-urchin',
+		id: 'purple-sea-urchin',
 		name: 'Purple Sea Urchin',
 		type: 'fish',
 		ingredients: [
