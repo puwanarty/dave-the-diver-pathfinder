@@ -40,4 +40,4 @@ Open [http://localhost:3000](http://localhost:3000) to view the project in the b
 
 ## Deployment
 
-The project is deployed on Vercel and can be viewed at [TBD](https://TBD).
+The project is deployed on Vercel and can be viewed at [https://dave-the-diver-pathfinder.vercel.app/](https://dave-the-diver-pathfinder.vercel.app/).
