@@ -1,108 +1,258 @@
-import { Inter } from 'next/font/google'
-import Image from 'next/image'
+import { ENHANCEMENTS, INGREDIENTS, RECIPES } from '@/constants'
+import React, { useEffect } from 'react'
 
-const inter = Inter({ subsets: ['latin'] })
+interface UserRecipeLevel {
+	id: string
+	level: number
+}
+
+const ingredientTrackingSections = [
+	{
+		type: 'fish',
+		ingredients: INGREDIENTS.filter((ingredient) => ingredient.type === 'fish'),
+	},
+	{
+		type: 'vegetable',
+		ingredients: INGREDIENTS.filter((ingredient) => ingredient.type === 'vegetable'),
+		remark: "*Farmable at Otto's Farm",
+	},
+	{
+		type: 'seaweed',
+		ingredients: INGREDIENTS.filter((ingredient) => ingredient.type === 'seaweed'),
+		remark: "*Farmable at Gumo's Farm",
+	},
+	{
+		type: 'seasoning',
+		ingredients: INGREDIENTS.filter((ingredient) => ingredient.type === 'seasoning'),
+		remark: '*Farmable at Dispatch & Cooking Pots',
+	},
+]
 
 export default function Home() {
+	const [dirty, setDirty] = React.useState(false)
+	const [userRecipeLevel, setUserRecipeLevel] = React.useState<UserRecipeLevel[]>([])
+	const trackingIngredients = (type: 'fish' | 'vegetable' | 'seaweed' | 'seasoning') => {
+		const trackingSection = ingredientTrackingSections.find((section) => section.type === type)
+		if (!trackingSection) return []
+
+		return trackingSection.ingredients.filter((ingredient) => {
+			const numberOfIngredientsPerRecipe = RECIPES.reduce((accumulator, recipe) => {
+				const ingredientData = recipe.ingredients.find(({ ingredientId }) => ingredientId === ingredient.id)
+				const numberOfIngredientsPerRecipe = ingredientData?.numberOfIngredientsPerRecipe || 0
+				const _currentLevel = userRecipeLevel.find(({ id }) => id === recipe.id)?.level || 0
+				return accumulator + numberOfIngredientsPerRecipe * _currentLevel
+			}, 0)
+
+			return numberOfIngredientsPerRecipe > 0
+		})
+	}
+
+	const remainingIngredients = (numberOfIngredientsPerRecipe: number, userRecipeLevel: number, targetLevel: number) => {
+		const enhancementIngredients = ENHANCEMENTS.find(
+			(e) => e.numberOfIngredientsPerRecipe === numberOfIngredientsPerRecipe
+		)?.enhancementIngredients
+		if (!enhancementIngredients) return 0
+		const sumOfEnhancementIngredientsFrom0ToTargetLevel = enhancementIngredients
+			.slice(0, targetLevel)
+			.reduce((a, b) => a + b, 0)
+		const sumOfEnhancementIngredientsFrom0ToCurrentLevel = enhancementIngredients
+			.slice(0, userRecipeLevel)
+			.reduce((a, b) => a + b, 0)
+
+		if (targetLevel <= userRecipeLevel) return 'N/A'
+		return sumOfEnhancementIngredientsFrom0ToTargetLevel - sumOfEnhancementIngredientsFrom0ToCurrentLevel
+	}
+
+	const levelUp = (recipeId: string) => {
+		const _currentLevel = userRecipeLevel.find(({ id }) => id === recipeId)?.level || 0
+		if (_currentLevel >= 10) return
+		const _currentLevelIndex = userRecipeLevel.findIndex(({ id }) => id === recipeId)
+		if (_currentLevelIndex === -1) {
+			setUserRecipeLevel([...userRecipeLevel, { id: recipeId, level: _currentLevel + 1 }])
+			return
+		}
+		const _currentLevelCopy = [...userRecipeLevel]
+		_currentLevelCopy[_currentLevelIndex].level = _currentLevel + 1
+		setUserRecipeLevel(_currentLevelCopy)
+	}
+
+	const levelDown = (recipeId: string) => {
+		const _currentLevel = userRecipeLevel.find(({ id }) => id === recipeId)?.level || 0
+		if (_currentLevel <= 1) {
+			const _currentLevelIndex = userRecipeLevel.findIndex(({ id }) => id === recipeId)
+			if (_currentLevelIndex !== -1) {
+				const _currentLevelCopy = [...userRecipeLevel]
+				_currentLevelCopy.splice(_currentLevelIndex, 1)
+				setUserRecipeLevel(_currentLevelCopy)
+			}
+			return
+		}
+		const _currentLevelIndex = userRecipeLevel.findIndex(({ id }) => id === recipeId)
+		if (_currentLevelIndex === -1) {
+			setUserRecipeLevel([...userRecipeLevel, { id: recipeId, level: _currentLevel - 1 }])
+			return
+		}
+		const _currentLevelCopy = [...userRecipeLevel]
+		_currentLevelCopy[_currentLevelIndex].level = _currentLevel - 1
+		setUserRecipeLevel(_currentLevelCopy)
+	}
+
+	useEffect(() => {
+		const _userRecipeLevel = localStorage.getItem('userRecipeLevel')
+		if (_userRecipeLevel) {
+			setUserRecipeLevel(JSON.parse(_userRecipeLevel))
+		}
+		setDirty(true)
+	}, [])
+
+	useEffect(() => {
+		if (dirty) {
+			localStorage.setItem('userRecipeLevel', JSON.stringify(userRecipeLevel))
+		}
+	}, [userRecipeLevel])
+
 	return (
-		<main className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}>
-			<div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-				<p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-					Get started by editing&nbsp;
-					<code className="font-mono font-bold">src/pages/index.tsx</code>
-				</p>
-				<div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-					<a
-						className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-						href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						By <Image src="/vercel.svg" alt="Vercel Logo" className="dark:invert" width={100} height={24} priority />
-					</a>
+		<div className="flex max-sm:flex-col">
+			<div className="w-full bg-gray-100 p-2 sm:min-h-screen sm:w-80">
+				<div className="flex flex-col items-center">
+					<h3 className="mb-4">TRACKING</h3>
+					<span className="mb-4 italic text-gray-400">
+						This is all ingredients that you need to collect to max out the recipes that you assigned level to.{' '}
+						<span className="text-blue-400">Blue</span> text is the remaining ingredients that you need to collect.
+					</span>
+					<div className="flex flex-col items-center">
+						{ingredientTrackingSections.map((section) => (
+							<React.Fragment key={section.type}>
+								<h4 className="mb-2">{section.type.toUpperCase()}</h4>
+								<table className="w-full table-fixed">
+									<thead>
+										<tr>
+											<th>Ingredient</th>
+											<th>Remaining</th>
+										</tr>
+									</thead>
+									<tbody>
+										{trackingIngredients(section.type as 'fish' | 'vegetable' | 'seaweed' | 'seasoning').map(
+											(ingredient) => {
+												const ingredientName = INGREDIENTS.find(({ id }) => id === ingredient.id)?.name
+												const remainingIngredientsResult = RECIPES.filter(
+													(recipe) => (userRecipeLevel.find(({ id }) => id === recipe.id)?.level || 0) > 0
+												).reduce((accumulator, recipe) => {
+													const numberOfIngredientsPerRecipe =
+														recipe.ingredients.find(({ ingredientId }) => ingredientId === ingredient.id)
+															?.numberOfIngredientsPerRecipe || 0
+													const _currentLevel = userRecipeLevel.find(({ id }) => id === recipe.id)?.level || 1
+													const remainingIngredientsResult = remainingIngredients(
+														numberOfIngredientsPerRecipe,
+														_currentLevel,
+														10
+													)
+													if (remainingIngredientsResult === 'N/A') return accumulator
+													return accumulator + remainingIngredientsResult
+												}, 0)
+												return (
+													remainingIngredientsResult > 0 && (
+														<tr key={ingredient.id}>
+															<td>{ingredientName}</td>
+															<td className="text-blue-400">{remainingIngredientsResult}</td>
+														</tr>
+													)
+												)
+											}
+										)}
+									</tbody>
+								</table>
+								<span className="mb-4 text-xs text-gray-400">{section.remark}</span>
+							</React.Fragment>
+						))}
+					</div>
 				</div>
 			</div>
-
-			<div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-				<Image
-					className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-					src="/next.svg"
-					alt="Next.js Logo"
-					width={180}
-					height={37}
-					priority
-				/>
-			</div>
-
-			<div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-				<a
-					href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-					className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2 className={`mb-3 text-2xl font-semibold`}>
-						Docs{' '}
-						<span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-							-&gt;
+			<main className="flex min-h-screen flex-1 justify-center p-4">
+				<div className="flex max-w-3xl flex-col items-center">
+					<div className="flex flex-col items-center">
+						<h1 className="mb-4">DAVE THE DIVER</h1>
+						<span className="mb-4 italic text-gray-400">
+							*This is not all recipes, this is only high efficiency recipes for now. and I plan to add all recipes in
+							the future*
 						</span>
-					</h2>
-					<p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-						Find in-depth information about Next.js features and API.
-					</p>
-				</a>
-
-				<a
-					href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-					className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2 className={`mb-3 text-2xl font-semibold`}>
-						Learn{' '}
-						<span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-							-&gt;
+						<span className="mb-2 italic text-gray-400">
+							Click <span className="text-xl font-bold text-green-400">+</span> button to track a recipe and assign
+							level to it.
 						</span>
-					</h2>
-					<p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-						Learn about Next.js in an interactive course with&nbsp;quizzes!
-					</p>
-				</a>
-
-				<a
-					href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-					className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2 className={`mb-3 text-2xl font-semibold`}>
-						Templates{' '}
-						<span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-							-&gt;
+						<span className="mb-4 italic text-gray-400">
+							Click <span className="text-xl font-bold text-red-400">-</span> button to untrack a recipe and remove
+							level from it.
 						</span>
-					</h2>
-					<p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-						Discover and deploy boilerplate example Next.js&nbsp;projects.
-					</p>
-				</a>
-
-				<a
-					href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-					className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<h2 className={`mb-3 text-2xl font-semibold`}>
-						Deploy{' '}
-						<span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-							-&gt;
-						</span>
-					</h2>
-					<p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-						Instantly deploy your Next.js site to a shareable URL with Vercel.
-					</p>
-				</a>
-			</div>
-		</main>
+					</div>
+					<div className="flex flex-col items-center">
+						{RECIPES.map((recipe) => (
+							<div key={recipe.id} className="mb-8 flex flex-col items-center">
+								<div className="mb-2 w-40 overflow-hidden rounded-lg border border-gray-400 bg-gray-100 p-2">
+									<img className="h-full w-full object-cover" src={recipe.image} alt={recipe.name} />
+								</div>
+								<h4 className="mb-2">{recipe.name}</h4>
+								<div className="mb-4 flex items-center justify-center">
+									<div className="flex items-center divide-gray-400 overflow-hidden rounded-lg border border-gray-400 p-2">
+										<button
+											className="w-10 bg-gray-200 text-red-400"
+											onClick={() => levelDown(recipe.id)}
+											disabled={(userRecipeLevel.find(({ id }) => id === recipe.id)?.level || 0) <= 0}
+										>
+											-
+										</button>
+										<p className="w-12 text-center">{userRecipeLevel.find(({ id }) => id === recipe.id)?.level || 0}</p>
+										<button
+											className="w-10 bg-gray-200 text-green-400"
+											onClick={() => levelUp(recipe.id)}
+											disabled={(userRecipeLevel.find(({ id }) => id === recipe.id)?.level || 0) >= 10}
+										>
+											+
+										</button>
+									</div>
+								</div>
+								<div className="flex flex-col items-center">
+									<table className="w-full table-fixed">
+										<thead>
+											<tr>
+												<th>Ingredient</th>
+												<th>Per Recipe</th>
+												<th>Lvl 5</th>
+												<th>Lvl 10</th>
+											</tr>
+										</thead>
+										<tbody>
+											{recipe.ingredients.map((ingredient) => {
+												const ingredientName = INGREDIENTS.find(({ id }) => id === ingredient.ingredientId)?.name
+												return (
+													<tr key={ingredient.ingredientId}>
+														<td>{ingredientName}</td>
+														<td>{ingredient.numberOfIngredientsPerRecipe}</td>
+														<td className="text-blue-400">
+															{remainingIngredients(
+																ingredient.numberOfIngredientsPerRecipe,
+																userRecipeLevel.find(({ id }) => id === recipe.id)?.level || 1,
+																5
+															)}
+														</td>
+														<td className="text-blue-400">
+															{remainingIngredients(
+																ingredient.numberOfIngredientsPerRecipe,
+																userRecipeLevel.find(({ id }) => id === recipe.id)?.level || 1,
+																10
+															)}
+														</td>
+													</tr>
+												)
+											})}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+			</main>
+		</div>
 	)
 }
