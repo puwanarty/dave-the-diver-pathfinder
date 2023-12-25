@@ -1,43 +1,43 @@
-# Next.js with Tailwind CSS Template
+# DAVE THE DIVER | Pathfinder
 
-This is a starter template for a Next.js project with Tailwind CSS. It's set up with some of the most common tools and configurations that you might need.
+This is a single page application (SPA) for tracking ingredients and recipes in the game Dave The Diver.
+
+## Built With
+
+- [Next.js](https://nextjs.org/)
+- [React](https://reactjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [TypeScript](https://www.typescriptlang.org/)
 
 ## Features
 
-- Next.js: A React framework with hybrid static & server rendering, TypeScript support, smart bundling, route pre-fetching, and more.
-- Tailwind CSS: A utility-first CSS framework packed with classes like flex, pt-4, text-center and rotate-90 that can be composed to build any design, directly in your markup.
-- Prettier: An opinionated code formatter that enforces a consistent style by parsing your code and re-printing it with its own rules.
-- ESLint: A pluggable and configurable linter tool for identifying and reporting on patterns in JavaScript.
+- Add, edit, and delete tracked recipes
+- Calculate the number of ingredients needed to enhance a recipe to a certain level (Lvl. 5 / Lvl. 10)
+
+_note: The application is not connected to a database. The data is stored in the local storage of the browser._
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+For more recipes, I plan to connect the application to a database and allow users help contribute to the list of recipes.
 
 ## Getting Started
 
-First, run the development server:
+To get started, clone the repository and install the dependencies:
 
 ```bash
-pnpm dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then, run the development server:
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```bash
+pnpm run dev
+```
 
-## Available Scripts
+Open [http://localhost:3000](http://localhost:3000) to view the project in the browser.
 
-In the project directory, you can run:
+## Deployment
 
-- `pnpm dev` - Runs the app in the development mode.
-- `pnpm build` - Builds the app for production.
-- `pnpm start` - Runs the built app in production mode.
-- `pnpm lint` - Runs the linter (ESLint).
-- `pnpm format` - Runs the code formatter (Prettier).
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-Enjoy your coding!
+The project is deployed on Vercel and can be viewed at [TBD](https://TBD).
