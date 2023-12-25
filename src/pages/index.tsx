@@ -188,7 +188,7 @@ export default function Home() {
 					</div>
 				</div>
 			</div>
-			<main className="flex min-h-screen flex-1 justify-center p-4">
+			<main className="flex min-h-screen flex-1 justify-center p-4 sm:ml-80">
 				<div className="flex max-w-3xl flex-col items-center">
 					<div className="flex flex-col items-center text-center">
 						<h1 className="mb-4">DAVE THE DIVER | Pathfinder</h1>
