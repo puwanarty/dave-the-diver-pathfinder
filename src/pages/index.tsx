@@ -14,7 +14,7 @@ const ingredientTrackingSections = [
 	{
 		type: 'vegetable',
 		ingredients: INGREDIENTS.filter((ingredient) => ingredient.type === 'vegetable'),
-		remark: "*Farmable at Otto's Farm",
+		remark: "*Farmable at Otto's Farm. except for 'Truffle'",
 	},
 	{
 		type: 'seaweed',
@@ -113,7 +113,7 @@ export default function Home() {
 
 	return (
 		<div className="flex max-sm:flex-col">
-			<div className="w-full bg-gray-100 p-2 sm:min-h-screen sm:w-80">
+			<div className="w-full bg-gray-100 p-2 shadow-md sm:fixed sm:bottom-0 sm:left-0 sm:top-0 sm:min-h-screen sm:w-80 sm:overflow-y-auto">
 				<div className="flex flex-col items-center">
 					<h3 className="mb-4">TRACKING</h3>
 					<span className="mb-4 italic text-gray-400">
@@ -170,7 +170,7 @@ export default function Home() {
 			</div>
 			<main className="flex min-h-screen flex-1 justify-center p-4">
 				<div className="flex max-w-3xl flex-col items-center">
-					<div className="flex flex-col items-center">
+					<div className="flex flex-col items-center text-center">
 						<h1 className="mb-4">DAVE THE DIVER</h1>
 						<span className="mb-4 italic text-gray-400">
 							*This is not all recipes, this is only high efficiency recipes for now. and I plan to add all recipes in
@@ -189,7 +189,11 @@ export default function Home() {
 						{RECIPES.map((recipe) => (
 							<div key={recipe.id} className="mb-8 flex flex-col items-center">
 								<div className="mb-2 w-40 overflow-hidden rounded-lg border border-gray-400 bg-gray-100 p-2">
-									<img className="h-full w-full object-cover" src={recipe.image} alt={recipe.name} />
+									{recipe.image ? (
+										<img className="h-full w-full object-cover" src={recipe.image} alt={recipe.name} />
+									) : (
+										<div className="flex h-full w-full items-center justify-center text-gray-400">N/A</div>
+									)}
 								</div>
 								<h4 className="mb-2">{recipe.name}</h4>
 								<div className="mb-4 flex items-center justify-center">
