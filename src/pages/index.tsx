@@ -191,7 +191,7 @@ export default function Home() {
 			<main className="flex min-h-screen flex-1 justify-center p-4">
 				<div className="flex max-w-3xl flex-col items-center">
 					<div className="flex flex-col items-center text-center">
-						<h1 className="mb-4">DAVE THE DIVER</h1>
+						<h1 className="mb-4">DAVE THE DIVER | Pathfinder</h1>
 						<span className="mb-4 italic text-gray-400">
 							*This is not all recipes, this is only high efficiency recipes for now. and I plan to add all recipes in
 							the future*
