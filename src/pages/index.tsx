@@ -97,6 +97,10 @@ export default function Home() {
 		setUserRecipeLevel(_currentLevelCopy)
 	}
 
+	const backToTop = () => {
+		window.scrollTo({ top: 0, behavior: 'smooth' })
+	}
+
 	useEffect(() => {
 		const _userRecipeLevel = localStorage.getItem('userRecipeLevel')
 		if (_userRecipeLevel) {
@@ -113,6 +117,22 @@ export default function Home() {
 
 	return (
 		<div className="flex max-sm:flex-col">
+			<button
+				className="fixed bottom-4 right-4 cursor-pointer rounded-full bg-gray-100 p-2 shadow-md"
+				onClick={backToTop}
+			>
+				<svg
+					className="h-6 w-6 text-gray-400 hover:text-gray-600"
+					fill="none"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth="2"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path d="M5 15l7-7 7 7" />
+				</svg>
+			</button>
 			<div className="w-full bg-gray-100 p-2 shadow-md sm:fixed sm:bottom-0 sm:left-0 sm:top-0 sm:min-h-screen sm:w-80 sm:overflow-y-auto">
 				<div className="flex flex-col items-center">
 					<h3 className="mb-4">TRACKING</h3>
